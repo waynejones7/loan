@@ -661,7 +661,8 @@
 
     function renderFilters() {
       filtersNode.classList.toggle("expanded", filtersExpanded);
-      const filterButtons = filters.map(item => `
+      const visibleFilters = filtersExpanded ? filters : filters.slice(0, 4);
+      const filterButtons = visibleFilters.map(item => `
         <button class="chip ${item === activeFilter ? "active" : ""}" type="button" data-filter="${escapeHtml(item)}">${escapeHtml(item)}</button>
       `).join("");
       const toggleText = filtersExpanded ? "收起" : "更多";
