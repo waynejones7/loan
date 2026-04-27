@@ -119,9 +119,9 @@
       display: flex;
       flex-wrap: wrap;
       gap: 8px;
-      max-height: 86px;
+      max-height: 46px;
       overflow: hidden;
-      padding: 12px 14px 6px;
+      padding: 12px 14px 8px;
       transition: max-height 180ms ease;
     }
     .filter-strip.expanded {
@@ -144,20 +144,17 @@
       border-color: var(--brand);
       box-shadow: 0 10px 22px rgba(37, 99, 235, 0.24);
     }
-    .filter-more {
-      display: flex;
-      justify-content: center;
-      padding: 0 14px 10px;
-    }
-    .filter-more button {
-      min-height: 30px;
-      border: 0;
-      border-radius: 8px;
-      padding: 0 12px;
+    .chip.more-chip {
       color: var(--brand);
-      background: transparent;
-      font-size: 13px;
-      font-weight: 700;
+      background: #f8fbff;
+      border-style: dashed;
+    }
+    .filter-strip.expanded .chip.more-chip {
+      width: auto;
+    }
+    #toggleFilters {
+      min-height: 30px;
+      padding: 0 10px;
     }
     .summary {
       display: grid;
@@ -497,9 +494,6 @@
     </header>
 
     <nav class="filter-strip" id="filters" aria-label="快捷筛选"></nav>
-    <div class="filter-more">
-      <button id="toggleFilters" type="button">展开全部筛选</button>
-    </div>
 
     <section class="summary">
       <div class="summary-item"><strong id="resultTotal">0</strong><span>匹配产品</span></div>
@@ -561,7 +555,6 @@
     const list = $("list");
     const empty = $("empty");
     const filtersNode = $("filters");
-    const toggleFilters = $("toggleFilters");
     const resultTotal = $("resultTotal");
     const bankTotal = $("bankTotal");
     const topType = $("topType");
@@ -668,10 +661,13 @@
 
     function renderFilters() {
       filtersNode.classList.toggle("expanded", filtersExpanded);
-      toggleFilters.textContent = filtersExpanded ? "收起筛选" : "展开全部筛选";
-      filtersNode.innerHTML = filters.map(item => `
+      const filterButtons = filters.map(item => `
         <button class="chip ${item === activeFilter ? "active" : ""}" type="button" data-filter="${escapeHtml(item)}">${escapeHtml(item)}</button>
       `).join("");
+      const toggleText = filtersExpanded ? "收起" : "更多";
+      filtersNode.innerHTML = filterButtons + `
+        <button class="chip more-chip" id="toggleFilters" type="button">${toggleText}</button>
+      `;
     }
 
     function renderStats(rows) {
@@ -768,9 +764,11 @@
       renderFilters();
       renderList();
     });
-    toggleFilters.addEventListener("click", () => {
-      filtersExpanded = !filtersExpanded;
-      renderFilters();
+    filtersNode.addEventListener("click", (event) => {
+      if (event.target.closest("#toggleFilters")) {
+        filtersExpanded = !filtersExpanded;
+        renderFilters();
+      }
     });
 
     list.addEventListener("click", (event) => {
